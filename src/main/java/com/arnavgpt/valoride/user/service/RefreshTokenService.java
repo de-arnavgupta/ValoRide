@@ -3,7 +3,7 @@ package com.arnavgpt.valoride.user.service;
 import com.arnavgpt.valoride.config.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -17,10 +17,10 @@ public class RefreshTokenService {
     private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
     private static final String USER_TOKENS_PREFIX = "user_tokens:";
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final StringRedisTemplate redisTemplate;
     private final JwtService jwtService;
 
-    public RefreshTokenService(RedisTemplate<String, String> redisTemplate, JwtService jwtService) {
+    public RefreshTokenService(StringRedisTemplate redisTemplate, JwtService jwtService) {
         this.redisTemplate = redisTemplate;
         this.jwtService = jwtService;
     }

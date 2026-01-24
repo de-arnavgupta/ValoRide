@@ -65,7 +65,7 @@ public class AuthController {
 
         String refreshToken = (request != null) ? request.getRefreshToken() : null;
         authService.logout(refreshToken);
-        return ResponseEntity.ok(ApiResponse.success("Logged out successfully", null));
+        return ResponseEntity.ok(ApiResponse.success("Logged out successfully"));
     }
 
     @PostMapping("/logout-all")
@@ -74,6 +74,6 @@ public class AuthController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         authService.logoutAll(userDetails.getId());
-        return ResponseEntity.ok(ApiResponse.success("Logged out from all devices", null));
+        return ResponseEntity.ok(ApiResponse.success("Logged out from all devices"));
     }
 }

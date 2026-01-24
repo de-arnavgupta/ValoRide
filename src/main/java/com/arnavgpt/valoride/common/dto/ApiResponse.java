@@ -37,8 +37,14 @@ public class ApiResponse<T> {
         return new ApiResponse<>(LocalDateTime.now(), 201, message, data, null);
     }
 
-    public static <T> ApiResponse<T> success(T data, PageInfo pageInfo) {
+    // Renamed to avoid ambiguity with success(String, T)
+    public static <T> ApiResponse<T> successWithPage(T data, PageInfo pageInfo) {
         return new ApiResponse<>(LocalDateTime.now(), 200, "Success", data, pageInfo);
+    }
+
+    // For void responses (like logout)
+    public static ApiResponse<Void> success(String message) {
+        return new ApiResponse<>(LocalDateTime.now(), 200, message, null, null);
     }
 
     public LocalDateTime getTimestamp() {
