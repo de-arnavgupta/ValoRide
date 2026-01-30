@@ -7,6 +7,7 @@ import com.arnavgpt.valoride.exception.BusinessException;
 import com.arnavgpt.valoride.exception.ForbiddenException;
 import com.arnavgpt.valoride.exception.InvalidRideStateException;
 import com.arnavgpt.valoride.exception.ResourceNotFoundException;
+import com.arnavgpt.valoride.notification.service.NotificationService;
 import com.arnavgpt.valoride.ride.dto.CancelRideRequest;
 import com.arnavgpt.valoride.ride.dto.RateRideRequest;
 import com.arnavgpt.valoride.ride.dto.RideRequestDto;
@@ -41,14 +42,17 @@ public class RideService {
     private final UserService userService;
     private final DriverService driverService;
     private final FareService fareService;
+    private final NotificationService notificationService;
 
     public RideService(RideRepository rideRepository, DriverRepository driverRepository,
-                       UserService userService, DriverService driverService, FareService fareService) {
+                       UserService userService, DriverService driverService, FareService fareService,
+                       NotificationService notificationService) {
         this.rideRepository = rideRepository;
         this.driverRepository = driverRepository;
         this.userService = userService;
         this.driverService = driverService;
         this.fareService = fareService;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -145,6 +149,9 @@ public class RideService {
         Ride savedRide = rideRepository.save(ride);
         logger.info("Ride {} accepted by driver {}", rideId, driver.getId());
 
+        // Send notification to rider
+        notificationService.sendRideAcceptedNotification(savedRide);
+
         return RideResponse.fromEntity(savedRide);
     }
 
@@ -168,6 +175,9 @@ public class RideService {
 
         Ride savedRide = rideRepository.save(ride);
         logger.info("Driver arrived for ride {}", rideId);
+
+        // Send notification to rider
+        notificationService.sendDriverArrivedNotification(savedRide);
 
         return RideResponse.fromEntity(savedRide);
     }
@@ -223,6 +233,9 @@ public class RideService {
         Ride savedRide = rideRepository.save(ride);
         logger.info("Ride {} completed. Fare: {}", rideId, ride.getFinalFare());
 
+        // Send notification to both rider and driver
+        notificationService.sendRideCompletedNotification(savedRide);
+
         return RideResponse.fromEntity(savedRide);
     }
 
@@ -265,6 +278,9 @@ public class RideService {
 
         Ride savedRide = rideRepository.save(ride);
         logger.info("Ride {} cancelled by {}", rideId, cancelledBy);
+
+        // Send cancellation notification
+        notificationService.sendRideCancelledNotification(savedRide, cancelledBy.name());
 
         return RideResponse.fromEntity(savedRide);
     }
