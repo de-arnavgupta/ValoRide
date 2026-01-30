@@ -4,6 +4,7 @@ import com.arnavgpt.valoride.config.JwtService;
 import com.arnavgpt.valoride.exception.DuplicateResourceException;
 import com.arnavgpt.valoride.exception.ResourceNotFoundException;
 import com.arnavgpt.valoride.exception.UnauthorizedException;
+import com.arnavgpt.valoride.notification.service.NotificationService;
 import com.arnavgpt.valoride.user.dto.AuthResponse;
 import com.arnavgpt.valoride.user.dto.LoginRequest;
 import com.arnavgpt.valoride.user.dto.RefreshTokenRequest;
@@ -32,17 +33,20 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
+    private final NotificationService notificationService;
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        JwtService jwtService,
                        RefreshTokenService refreshTokenService,
-                       AuthenticationManager authenticationManager) {
+                       AuthenticationManager authenticationManager,
+                       NotificationService notificationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
         this.authenticationManager = authenticationManager;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -69,6 +73,9 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
         logger.info("User registered successfully with id: {}", savedUser.getId());
+
+        // Send welcome notification
+        notificationService.sendWelcomeNotification(savedUser);
 
         return generateAuthResponse(savedUser);
     }
