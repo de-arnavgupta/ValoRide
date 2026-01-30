@@ -7,6 +7,7 @@ import com.arnavgpt.valoride.driver.entity.Driver;
 import com.arnavgpt.valoride.driver.repository.DriverRepository;
 import com.arnavgpt.valoride.exception.BusinessException;
 import com.arnavgpt.valoride.exception.ResourceNotFoundException;
+import com.arnavgpt.valoride.notification.service.NotificationService;
 import com.arnavgpt.valoride.user.dto.UserResponse;
 import com.arnavgpt.valoride.user.entity.Role;
 import com.arnavgpt.valoride.user.repository.UserRepository;
@@ -27,10 +28,13 @@ public class AdminService {
 
     private final DriverRepository driverRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
-    public AdminService(DriverRepository driverRepository, UserRepository userRepository) {
+    public AdminService(DriverRepository driverRepository, UserRepository userRepository,
+                        NotificationService notificationService) {
         this.driverRepository = driverRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     public Page<DriverResponse> getPendingDrivers(Pageable pageable) {
@@ -66,7 +70,8 @@ public class AdminService {
         Driver savedDriver = driverRepository.save(driver);
         logger.info("Driver approved: {}", driverId);
 
-        // TODO: Send approval notification email via Kafka
+        // Send approval notification
+        notificationService.sendDriverApprovedNotification(savedDriver);
 
         return DriverResponse.fromEntity(savedDriver);
     }
@@ -94,7 +99,8 @@ public class AdminService {
         Driver savedDriver = driverRepository.save(driver);
         logger.info("Driver rejected: {} - Reason: {}", driverId, request.getReason());
 
-        // TODO: Send rejection notification email via Kafka
+        // Send rejection notification
+        notificationService.sendDriverRejectedNotification(savedDriver);
 
         return DriverResponse.fromEntity(savedDriver);
     }
