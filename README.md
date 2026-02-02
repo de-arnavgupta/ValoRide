@@ -65,7 +65,7 @@ A modern, scalable ride-sharing backend API built with Spring Boot. ValoRide pro
 - **Maven 3.8+**
 - **PostgreSQL 14+**
 - **Redis 7+**
-- **Apache Kafka** (optional, for event-driven features)
+- **Apache Kafka** (optional) - Required only for real-time event streaming features like ride status notifications and driver location broadcasts. The application works fully without Kafka.
 
 ## Installation 🚀
 
